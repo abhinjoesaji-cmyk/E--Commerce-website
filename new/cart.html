@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Q-Store - Cart</title>
+  <link rel="icon" href="../logo.png" class="logo">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="navbar">
+      <div class="logo">
+        <a href="../index.html"><img src="../images/logo-large.jpg" width="125px"></a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="product.html">Products</a></li>
+          <li><a href="About.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="Account.html">Account</a></li>
+        </ul>
+      </nav>
+      <a href="cart.html"><img src="../images/cart.png" width="30px" height="30px"></a>
+    </div>
+  </div>
+
+  <!-- Cart Items Details -->
+  <div class="small-container cart-page">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="cart-table-body">
+        <!-- Rows injected by JS -->
+      </tbody>
+    </table>
+
+    <!-- Total Price -->
+    <div class="total-price">
+      <table>
+        <tr>
+          <td>Subtotal</td>
+          <td id="subtotal-price">$0.00</td>
+        </tr>
+        <tr>
+          <td>Tax</td>
+          <td id="tax-price">$0.00</td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td id="total-price">$0.00</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align: right; border: none;">
+            <a href="checkout.html" class="btn">Procced to Checkout</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <script src="../script.js"></script>
+  <script>
+    // Use the script.js or define specific cart rendering here
+    // Since script.js has general cart logic, we can use it, but rendering is specific to this page
+
+    function renderCart() {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      let tableBody = document.getElementById("cart-table-body");
+      let subtotalEl = document.getElementById("subtotal-price");
+      let taxEl = document.getElementById("tax-price");
+      let totalEl = document.getElementById("total-price");
+
+      tableBody.innerHTML = "";
+      let subtotal = 0;
+
+      cart.forEach((item, index) => {
+        let itemTotal = item.price * (item.quantity || 1);
+        subtotal += itemTotal;
+
+        let row = `
+                    <tr>
+                        <td>
+                            <div class="cart-info">
+                                <img src="${item.image}">
+                                <div>
+                                    <p>${item.name}</p>
+                                    <small>Price: $${item.price}</small>
+                                    <br>
+                                    <a href="#" onclick="removeFromCart(${index}); return false;">Remove</a>
+                                </div>
+                            </div>
+                        </td>
+                        <td><input type="number" value="${item.quantity || 1}" min="1" onchange="updateQuantity(${index}, this.value)"></td>
+                        <td>$${itemTotal}</td>
+                    </tr>
+                `;
+        tableBody.insertAdjacentHTML('beforeend', row);
+      });
+
+      let tax = Math.round(subtotal * 0.05); // 5% tax example
+      let total = subtotal + tax;
+
+      subtotalEl.innerText = "$" + subtotal;
+      taxEl.innerText = "$" + tax;
+      totalEl.innerText = "$" + total;
+    }
+
+    function updateQuantity(index, quantity) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if (quantity < 1) quantity = 1;
+      cart[index].quantity = parseInt(quantity);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    // Initial render
+    renderCart();
+
+    // Override removeFromCart from script.js to just reload or re-render
+    // Actually script.js removeFromCart reloads page, which works fine.
+  </script>
+</body>
+
+</html>
